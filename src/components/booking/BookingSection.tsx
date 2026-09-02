@@ -210,10 +210,13 @@ export function BookingSection() {
           </div>
           <p className="max-w-xs text-right text-sm text-[var(--text-muted)]">
             <span className="block text-[var(--text-primary)]">
-              $449 · 60 min · 30+ pics · 20× 6×4&quot; prints
+              $350 · portrait session · 45 min
             </span>
             <span className="mt-2 block text-[var(--text-primary)]">
-              $699 · 90 min · 45+ pics · 35× 6×4&quot; prints
+              $450 · extended session · 60 min
+            </span>
+            <span className="mt-2 block text-[var(--text-primary)]">
+              Picture-only from $10
             </span>
             <span className="mt-3 block text-xs">{site.eveningHoldWindowLabel}</span>
           </p>

@@ -18,6 +18,7 @@ type Body = {
  *
  * Resend: https://resend.com/docs/api-reference/emails/send-email
  * Env: RESEND_API_KEY, RESEND_FROM (verified sender), optional BOOKING_INBOX_EMAIL (defaults to site.email)
+ * Optional Twilio SMS: TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM, TWILIO_TO
  */
 export async function POST(request: Request) {
   let raw: Body;
@@ -43,8 +44,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const inbox =
-    process.env.BOOKING_INBOX_EMAIL?.trim() || site.email;
+  const inbox = process.env.BOOKING_INBOX_EMAIL?.trim() || site.email;
   const lines = [
     "**New intelligent hold — Mark Photography**",
     id ? `Hold id: \`${id}\`` : null,
@@ -58,7 +58,7 @@ export async function POST(request: Request) {
     .join("\n");
 
   let discordOk = false;
-  const webhook = process.env.DISCORD_WEBHOOK_URL;
+  const webhook = process.env.DISCORD_WEBHOOK_URL?.trim();
   if (webhook) {
     try {
       const res = await fetch(webhook, {
@@ -75,9 +75,42 @@ export async function POST(request: Request) {
     }
   }
 
+  let smsOk = false;
+  const twilioSid = process.env.TWILIO_ACCOUNT_SID?.trim();
+  const twilioAuth = process.env.TWILIO_AUTH_TOKEN?.trim();
+  const twilioFrom = process.env.TWILIO_FROM?.trim();
+  const twilioTo = process.env.TWILIO_TO?.trim();
+  if (twilioSid && twilioAuth && twilioFrom && twilioTo) {
+    try {
+      const body = new URLSearchParams({
+        To: twilioTo,
+        From: twilioFrom,
+        Body: `New hold: ${name} ${email} | ${sessionType} | ${date} ${time} | ${durationMinutes} min | ${notes || "No notes"}`,
+      });
+      const res = await fetch(
+        `https://api.twilio.com/2010-04-01/Accounts/${twilioSid}/Messages.json`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Basic ${Buffer.from(`${twilioSid}:${twilioAuth}`).toString("base64")}`,
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: body.toString(),
+        },
+      );
+      smsOk = res.ok;
+      if (!smsOk) {
+        const errText = await res.text().catch(() => "");
+        console.error("Twilio booking SMS failed", res.status, errText);
+      }
+    } catch (e) {
+      console.error("Twilio booking SMS error", e);
+    }
+  }
+
   let emailed = false;
-  const resendKey = process.env.RESEND_API_KEY;
-  const resendFrom = process.env.RESEND_FROM;
+  const resendKey = process.env.RESEND_API_KEY?.trim();
+  const resendFrom = process.env.RESEND_FROM?.trim();
   if (resendKey && resendFrom) {
     try {
       const res = await fetch("https://api.resend.com/emails", {
@@ -107,19 +140,20 @@ export async function POST(request: Request) {
     }
   }
 
-  if (!webhook && !emailed) {
+  if (!webhook && !emailed && !smsOk) {
     return NextResponse.json({
       ok: true,
       delivered: false,
       warning:
-        "No DISCORD_WEBHOOK_URL or Resend env — configure one to receive hold alerts.",
+        "No DISCORD_WEBHOOK_URL, Resend, or Twilio configuration found — configure one to receive hold alerts.",
     });
   }
 
   return NextResponse.json({
     ok: true,
-    delivered: discordOk || emailed,
+    delivered: discordOk || smsOk || emailed,
     discord: discordOk,
+    sms: smsOk,
     email: emailed,
   });
 }

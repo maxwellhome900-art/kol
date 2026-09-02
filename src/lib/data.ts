@@ -22,7 +22,7 @@ export const site = {
   devHeadline: "Interfaces, Systems, and Product Craft",
   devSubheadline:
     "Full-stack engineering with a designer's eye — shipping resilient Next.js apps, APIs, and design systems that feel inevitable in the hand.",
-  email: "mark@example.com",
+  email: "markmarc2500@gmail.com",
   /** Legacy external scheduling — smart booking lives on-site at #booking */
   schedulingUrl: "https://calendly.com/mark-photography",
   social: {
@@ -44,30 +44,30 @@ export type PriceTier = {
 
 export const pricingTiers: PriceTier[] = [
   {
-    name: "Night session — editorial",
+    name: "Portrait session",
     tagline:
-      "One hour on the avenue, full digital set, and tactile 6×4\" prints.",
-    price: "$449",
+      "A focused session for editorial portraits, city-light framing, and polished final selects.",
+    price: "$350",
     unit: "/ session",
     features: [
-      "60 minute shoot (evening holds)",
-      "30+ hand-edited high-resolution images",
-      "20 professional 6×4 inch prints (your selects; lustre or matte)",
-      "Private online gallery + full print release on files",
+      "45 minute shoot with guided posing and direction",
+      "15+ hand-edited high-resolution images",
+      "Private gallery delivery for final selection",
+      "Ideal for portraits, mini campaigns, and personal branding",
     ],
     highlighted: false,
   },
   {
-    name: "Night session — extended",
+    name: "Extended session",
     tagline:
-      "Ninety minutes, a deeper edit count, and a larger 6×4\" print bundle.",
-    price: "$699",
+      "More time for outfits, movement, multiple looks, and a larger gallery to choose from.",
+    price: "$450",
     unit: "/ session",
     features: [
-      "90 minute shoot (evening holds)",
-      "45+ hand-edited high-resolution images",
-      "35 professional 6×4 inch prints (your selects; lustre or matte)",
-      "Priority turnaround + gallery + print release",
+      "60 minute shoot with more location and styling flexibility",
+      "25+ refined high-resolution images",
+      "Priority editing + gallery + print-ready delivery",
+      "Perfect for full branding, couples, or storytelling sets",
     ],
     highlighted: true,
   },
@@ -253,10 +253,11 @@ export const skills = [
 ] as const;
 
 export const sessionTypes = [
-  '$449 — 60 min, 30+ images, 20× 6×4" prints',
-  '$699 — 90 min, 45+ images, 35× 6×4" prints',
-  "Street / documentary",
-  "Custom Times Square session",
+  '$350 — portrait session, 45 min, 15+ images',
+  '$450 — extended session, 60 min, 25+ images',
+  'Only pictures — from $10',
+  'Street / documentary',
+  'Custom Times Square session',
 ] as const;
 
 export type SessionType = (typeof sessionTypes)[number];

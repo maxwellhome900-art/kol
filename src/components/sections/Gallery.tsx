@@ -13,9 +13,18 @@ import { Badge } from "@/components/ui/badge";
 
 const categories: (GalleryCategory | "All")[] = ["All", "Portraits", "Street"];
 
+const stripFileExtension = (value: string) => {
+  const clean = (value.split(/[?#]/)[0].split("/").pop() ?? value)
+    .replace(/\.[^/.]+$/i, "")
+    .replace(/%20/g, " ");
+
+  return decodeURIComponent(clean).trim();
+};
+
 export function Gallery() {
   const [filter, setFilter] = useState<(typeof categories)[number]>("All");
   const [active, setActive] = useState<GalleryItem | null>(null);
+  const [dynamicGallery, setDynamicGallery] = useState<GalleryItem[]>([]);
   const sectionRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -23,10 +32,15 @@ export function Gallery() {
   });
   const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
 
+
+  const combined = useMemo(() => {
+    return [...gallery, ...dynamicGallery];
+  }, [dynamicGallery]);
+
   const filtered = useMemo(() => {
-    if (filter === "All") return gallery;
-    return gallery.filter((g) => g.category === filter);
-  }, [filter]);
+    if (filter === "All") return combined;
+    return combined.filter((g) => g.category === filter);
+  }, [filter, combined]);
 
   const activeIndex = useMemo(() => {
     if (!active) return 0;
@@ -50,6 +64,33 @@ export function Gallery() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [active, activeIndex, filtered]);
+
+  useEffect(() => {
+    let mounted = true;
+    fetch("/api/images")
+      .then((r) => r.json())
+      .then((data) => {
+        if (!mounted || !data) return;
+        const items: GalleryItem[] = [];
+        Object.entries(data).forEach(([category, list]) => {
+          (list as string[]).forEach((src, idx) => {
+            const fileName = stripFileExtension(src);
+            items.push({
+              id: `${category}-${idx}-${fileName}`,
+              src,
+              alt: fileName,
+              category: category as GalleryCategory,
+              aspect: "landscape",
+            });
+          });
+        });
+        setDynamicGallery(items);
+      })
+      .catch(() => {});
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const goPrev = useCallback(() => {
     if (!active) return;
@@ -93,11 +134,7 @@ export function Gallery() {
           </h2>
           <p className="mt-4 max-w-2xl text-[var(--text-muted)]">
             Masonry grid with cinematic hover, parallax atmosphere, and a
-            fullscreen lightbox. Swap frames in{" "}
-            <code className="rounded bg-white/10 px-1.5 py-0.5 text-xs">
-              src/lib/data.ts
-            </code>
-            .
+            fullscreen lightbox.
           </p>
 
           <motion.div
@@ -127,6 +164,7 @@ export function Gallery() {
             ))}
           </motion.div>
         </motion.div>
+
 
         <motion.div
           layout
@@ -159,10 +197,9 @@ export function Gallery() {
                 <GalleryImageCell item={g} />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                 <div className="absolute bottom-0 left-0 right-0 translate-y-2 p-4 opacity-0 transition duration-500 group-hover:translate-y-0 group-hover:opacity-100">
-                  <Badge variant="amber" className="mb-2 rounded-full text-[10px]">
+                  <Badge variant="amber" className="rounded-full text-[10px]">
                     {g.category}
                   </Badge>
-                  <p className="text-sm font-medium text-white">{g.alt}</p>
                 </div>
               </motion.button>
             ))}
@@ -223,20 +260,16 @@ export function Gallery() {
                   src={active.src}
                   alt={active.alt}
                   fill
-                  className="object-cover"
+                  className="object-contain"
                   sizes="100vw"
+                  quality={100}
                   priority
                 />
               </div>
-              <div className="flex flex-col gap-1 p-6 md:flex-row md:items-center md:justify-between">
-                <div>
-                  <p className="text-xs font-medium uppercase tracking-[0.25em] text-amber-300/90">
-                    {active.category}
-                  </p>
-                  <p className="mt-1 text-lg font-medium text-[var(--text-primary)]">
-                    {active.alt}
-                  </p>
-                </div>
+              <div className="flex items-center justify-between gap-3 p-4 md:p-6">
+                <p className="text-xs font-medium uppercase tracking-[0.25em] text-amber-300/90">
+                  {active.category}
+                </p>
                 <p className="text-xs text-[var(--text-muted)]">
                   Use arrow keys to browse
                 </p>
@@ -269,6 +302,7 @@ function GalleryImageCell({ item }: { item: GalleryItem }) {
           loaded ? "opacity-100 blur-0" : "opacity-0 blur-md"
         }`}
         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+        quality={100}
         onLoad={() => setLoaded(true)}
       />
     </>

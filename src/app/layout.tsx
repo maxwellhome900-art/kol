@@ -25,12 +25,11 @@ export const metadata: Metadata = {
     template: `%s — ${site.businessName}`,
   },
   description:
-    `${site.businessName}: software engineer by day, photographer by night — packages from $449 (60 min + prints) and $699 (90 min + prints), evening holds 7 PM–1 AM. ${site.agentName} for bookings and questions.`,
+    `${site.businessName}: portrait sessions from $350 and extended sessions from $450, with picture-only orders from $10. Evening holds run 7 PM–1 AM. ${site.agentName} handles booking and questions.`,
   keywords: [
     "portfolio",
     "software engineer",
     "photographer",
-    "Next.js",
     "React",
     "street photography",
   ],
@@ -46,7 +45,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: `${site.businessName} — ${site.name}`,
     description:
-      `${site.businessName}: engineering and photography — gallery, $449 / $699 packages with 6×4 prints, and ${site.agentName}.`,
+      `${site.businessName}: photography gallery, portrait and extended sessions from $350 / $450, picture-only work from $10, and ${site.agentName}.`,
   },
   robots: { index: true, follow: true },
 };

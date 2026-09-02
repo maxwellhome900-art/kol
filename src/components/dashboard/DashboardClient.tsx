@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Calendar, LayoutDashboard } from "lucide-react";
-import { useEffect, useMemo, useState, type ChangeEvent } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { BookingRecord } from "@/lib/booking/types";
 import { useBooking } from "@/context/booking-context";
 import { site } from "@/lib/data";
@@ -36,52 +36,6 @@ export default function DashboardClient() {
   );
 
   const [upcoming, setUpcoming] = useState<BookingRecord[]>([]);
-  const [uploads, setUploads] = useState<string[]>([]);
-
-  useEffect(() => {
-    const stored = typeof window !== "undefined" ? window.localStorage.getItem("studio-uploads") : null;
-    if (stored) {
-      try {
-        setUploads(JSON.parse(stored));
-      } catch {
-        setUploads([]);
-      }
-    }
-  }, []);
-
-  const saveUploads = (items: string[]) => {
-    setUploads(items);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem("studio-uploads", JSON.stringify(items));
-    }
-  };
-
-  const handleUploadFiles = async (event: ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (!files) return;
-
-    const readFile = (file: File) =>
-      new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          if (typeof reader.result === "string") {
-            resolve(reader.result);
-          } else {
-            reject(new Error("Unable to read file"));
-          }
-        };
-        reader.onerror = () => reject(reader.error);
-        reader.readAsDataURL(file);
-      });
-
-    const results = await Promise.all(Array.from(files).map(readFile));
-    saveUploads([...results, ...uploads].slice(0, 12));
-    event.target.value = "";
-  };
-
-  const removeUpload = (index: number) => {
-    saveUploads(uploads.filter((_, i) => i !== index));
-  };
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -165,6 +119,47 @@ export default function DashboardClient() {
                 </CardContent>
               </Card>
             ))}
+          </div>
+
+          <div className="mb-10 grid gap-4 lg:grid-cols-3">
+            <Card className="border-sky-400/20 bg-sky-500/5">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-sky-100/80">
+                  Portrait sessions
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="font-[family-name:var(--font-syne)] text-2xl font-bold text-[var(--text-primary)]">
+                  {bookings.filter((b) => b.sessionType.includes("$350")).length}
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-amber-400/20 bg-amber-500/5">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-amber-100/80">
+                  Extended sessions
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="font-[family-name:var(--font-syne)] text-2xl font-bold text-[var(--text-primary)]">
+                  {bookings.filter((b) => b.sessionType.includes("$450")).length}
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-emerald-400/20 bg-emerald-500/5">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-emerald-100/80">
+                  Picture-only orders
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="font-[family-name:var(--font-syne)] text-2xl font-bold text-[var(--text-primary)]">
+                  {bookings.filter((b) => b.sessionType.toLowerCase().includes("picture")).length}
+                </p>
+              </CardContent>
+            </Card>
           </div>
 
           <div className="grid gap-10 lg:grid-cols-2">

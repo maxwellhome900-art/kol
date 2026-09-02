@@ -9,8 +9,8 @@ export function SiteFooter() {
     <footer className="border-t border-[var(--border-glass)] px-6 py-10">
       <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-6 text-sm text-[var(--text-muted)] md:flex-row md:items-center">
         <p>
-          © {new Date().getFullYear()} {site.businessName}. Crafted with Next.js,
-          Tailwind, Framer Motion, and ShadCN-style primitives.
+          © {new Date().getFullYear()} {site.businessName}. Built with Tailwind,
+          Framer Motion, and refined interface patterns.
         </p>
         <motion.div whileHover={{ y: -2 }}>
           <Link

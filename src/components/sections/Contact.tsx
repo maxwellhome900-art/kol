@@ -23,6 +23,31 @@ export function Contact({ variant = "photo" }: { variant?: ContactVariant }) {
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const form = e.currentTarget as HTMLFormElement;
+    const fd = new FormData(form);
+    const name = String(fd.get("name") ?? "").trim();
+    const fromEmail = String(fd.get("email") ?? "").trim();
+    const message = String(fd.get("message") ?? "").trim();
+
+    const subject = isDev
+      ? `Inquiry: Web app — ${name || "visitor"}`
+      : `Times Square booking — ${name || "visitor"}`;
+
+    const bodyLines = [
+      `Name: ${name}`,
+      `Email: ${fromEmail}`,
+      "",
+      message || "",
+    ].join("\n");
+
+    const mailto = `mailto:${encodeURIComponent(
+      site.email,
+    )}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(
+      bodyLines,
+    )}`;
+
+    // Open the user's email client to send the message
+    window.location.href = mailto;
     setStatus("sending");
     window.setTimeout(() => setStatus("sent"), 900);
   }
@@ -57,9 +82,16 @@ export function Contact({ variant = "photo" }: { variant?: ContactVariant }) {
             Contact
           </p>
           <h2 className="mt-3 font-[family-name:var(--font-syne)] text-3xl font-semibold tracking-tight text-[var(--text-primary)] md:text-4xl">
-            {isDev
-              ? `Hire ${site.name} for product engineering`
-              : `Book ${site.name} for Times Square sessions`}
+            {isDev ? (
+              `Hire ${site.name} for product engineering`
+            ) : (
+              <a
+                href={`mailto:${site.email}?subject=Times%20Square%20Booking`}
+                className="hover:underline"
+              >
+                {`Book ${site.name} for Times Square sessions`}
+              </a>
+            )}
           </h2>
           <p className="mt-4 text-[var(--text-muted)]">
             {isDev ? (

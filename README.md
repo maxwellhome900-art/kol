@@ -95,6 +95,15 @@ SEO base URL: set **`metadataBase`** in **`src/app/layout.tsx`** to your product
 
 Remote images use **Unsplash**. Allowed host is configured in **`next.config.ts`** (`images.remotePatterns`). Add hosts there if you self-host assets or use another CDN.
 
+### Uploading images for Times Square gallery
+
+- Drop image files into `public/Portraits` or `public/Street`.
+- Supported formats: `jpg`, `jpeg`, `png`, `webp`, `gif`.
+- Filenames will be served as `/Portraits/your-file.jpg` or `/Street/your-file.jpg`.
+- The site automatically lists images placed in those folders via `/api/images` — no code changes required. When running `npm run dev` the gallery updates on refresh; in production, redeploy or upload files to your deployment's `public` equivalent.
+
+Tip: use simple, web-safe filenames (no spaces) and optionally prefix with `portrait-` or `street-` to keep things organized.
+
 ## Turbopack root
 
 If you see multiple-lockfile warnings elsewhere, **`next.config.ts`** sets `turbopack.root` to this project folder so the correct app is built.

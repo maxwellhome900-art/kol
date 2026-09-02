@@ -96,12 +96,14 @@ export function Navbar() {
             </Link>
           )}
           {!isDashboard && !isDev && (
-            <Link
-              href="/dev"
+            <a
+              href="https://mark-portfolio-eight.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
               className="mr-2 rounded-full border border-sky-400/25 bg-sky-500/10 px-3 py-1.5 text-xs font-semibold text-sky-100 transition hover:bg-sky-500/20"
             >
               Dev portfolio
-            </Link>
+            </a>
           )}
           {!isDashboard && isDev && (
             <Link
@@ -181,13 +183,15 @@ export function Navbar() {
               </Link>
             )}
             {!isDashboard && !isDev && (
-              <Link
-                href="/dev"
+              <a
+                href="https://mark-portfolio-eight.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={() => setOpen(false)}
                 className="rounded-xl bg-sky-500/15 px-3 py-2 text-center text-sm font-semibold text-sky-100"
               >
                 Web development
-              </Link>
+              </a>
             )}
             {!isDashboard && isDev && (
               <Link

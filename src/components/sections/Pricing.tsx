@@ -22,7 +22,7 @@ export function Pricing() {
             Price menu
           </p>
           <h2 className="mt-3 font-[family-name:var(--font-syne)] text-3xl font-semibold tracking-tight text-[var(--text-primary)] md:text-4xl">
-            Night packages — $449 &amp; $699 — {site.businessName}
+            Packages — $350 &amp; $450 — {site.businessName}
           </h2>
           <p className="mt-4 text-[var(--text-muted)]">
             {site.eveningHoldWindowLabel} Scope and nuance through{" "}
