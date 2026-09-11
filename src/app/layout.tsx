@@ -3,6 +3,7 @@ import { Outfit, Syne } from "next/font/google";
 import "./globals.css";
 import { GlobalMarkoAgent } from "@/components/chat/GlobalMarkoAgent";
 import { BookingProvider } from "@/context/booking-context";
+import { DevHydrationGate } from "@/components/providers/dev-hydration-gate";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { site } from "@/lib/data";
 
@@ -68,11 +69,16 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${outfit.variable} ${syne.variable} h-full scroll-smooth antialiased`}
     >
-      <body className="min-h-full bg-[var(--background)] text-[var(--foreground)]">
+      <body
+        suppressHydrationWarning
+        className="min-h-full bg-[var(--background)] text-[var(--foreground)]"
+      >
         <ThemeProvider>
           <BookingProvider>
-            {children}
-            <GlobalMarkoAgent />
+            <DevHydrationGate>
+              {children}
+              <GlobalMarkoAgent />
+            </DevHydrationGate>
           </BookingProvider>
         </ThemeProvider>
       </body>

@@ -272,7 +272,7 @@ export default function DashboardClient() {
               </CardHeader>
               <CardContent>
                 <p className="mb-4 text-center text-sm font-medium text-[var(--text-muted)]">
-                  {cursor.toLocaleString("default", {
+                  {cursor.toLocaleString("en-US", {
                     month: "long",
                     year: "numeric",
                   })}

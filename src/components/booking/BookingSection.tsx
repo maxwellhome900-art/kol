@@ -237,7 +237,7 @@ export function BookingSection() {
               <div className="flex items-center gap-2 text-[var(--text-primary)]">
                 <CalendarDays className="h-5 w-5 text-amber-300/90" />
                 <span className="font-[family-name:var(--font-syne)] text-lg font-semibold">
-                  {cursor.toLocaleString("default", {
+                  {cursor.toLocaleString("en-US", {
                     month: "long",
                     year: "numeric",
                   })}
