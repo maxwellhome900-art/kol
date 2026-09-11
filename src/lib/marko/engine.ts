@@ -531,7 +531,7 @@ export function replyToMarko(
   }
 
   if (has(q, "review", "testimonial", "what people say", "what clients")) {
-    const engineering = surface === "dev" || has(q, "engineering", "collaborator", "hire");
+    const engineering = has(q, "engineering", "collaborator", "hire");
     return {
       memory: next,
       reply: {

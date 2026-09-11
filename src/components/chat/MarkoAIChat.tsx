@@ -200,16 +200,14 @@ export function MarkoAIChat() {
         bookings,
         memoryRef.current,
       );
+      const marko: Bubble = {
+        id: createBubbleId(),
+        from: "marko",
+        text: reply.text,
+        actions: reply.actions,
+      };
       setBubbles((current) => {
-        const next = [
-          ...current,
-          {
-            id: createBubbleId(),
-            from: "marko",
-            text: reply.text,
-            actions: reply.actions,
-          },
-        ];
+        const next = [...current, marko];
         persist(memory, next);
         return next;
       });
