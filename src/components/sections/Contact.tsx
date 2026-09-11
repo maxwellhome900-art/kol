@@ -4,12 +4,6 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";
 import { Send } from "lucide-react";
-import {
-  IconGitHub,
-  IconInstagram,
-  IconLinkedIn,
-  IconX,
-} from "@/components/icons/BrandIcons";
 import { site } from "@/lib/data";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -52,13 +46,6 @@ export function Contact({ variant = "photo" }: { variant?: ContactVariant }) {
     window.setTimeout(() => setStatus("sent"), 900);
   }
 
-  const socials = [
-    { href: site.social.github, icon: IconGitHub, label: "GitHub" },
-    { href: site.social.linkedin, icon: IconLinkedIn, label: "LinkedIn" },
-    { href: site.social.instagram, icon: IconInstagram, label: "Instagram" },
-    { href: site.social.twitter, icon: IconX, label: "X (Twitter)" },
-  ];
-
   return (
     <section
       id="contact"
@@ -94,27 +81,9 @@ export function Contact({ variant = "photo" }: { variant?: ContactVariant }) {
             )}
           </h2>
           <p className="mt-4 text-[var(--text-muted)]">
-            {isDev ? (
-              <>
-                Tell me about your stack, timeline, and users — I reply with a
-                concise plan. Prefer async? Open an issue on GitHub after we
-                talk scope.
-              </>
-            ) : (
-              <>
-                Prefer the bubble? Open{" "}
-                <strong>{site.agentName}</strong> — it can ping Mark when{" "}
-                instantly when{" "}
-                <code className="rounded bg-white/10 px-1 text-xs">
-                  DISCORD_WEBHOOK_URL
-                </code>{" "}
-                is set in{" "}
-                <code className="rounded bg-white/10 px-1 text-xs">
-                  .env.local
-                </code>
-                .
-              </>
-            )}
+            {isDev
+              ? "Tell me about your stack, timeline, and users — I reply with a concise plan."
+              : "Tell me about your shoot, wardrobe, and timeline. Call or write — I'll reply."}
           </p>
         </motion.div>
 
@@ -209,26 +178,12 @@ export function Contact({ variant = "photo" }: { variant?: ContactVariant }) {
               >
                 {site.email}
               </Link>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-[var(--text-muted)]">
-                Social
-              </p>
-              <div className="mt-4 flex flex-wrap gap-3">
-                {socials.map(({ href, icon: Icon, label }) => (
-                  <motion.div key={label} whileHover={{ y: -3 }}>
-                    <Link
-                      href={href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={label}
-                      className="flex h-11 w-11 items-center justify-center rounded-2xl border border-[var(--border-glass)] bg-white/5 text-[var(--text-primary)] transition hover:border-sky-400/40 hover:text-sky-300"
-                    >
-                      <Icon className="h-5 w-5" />
-                    </Link>
-                  </motion.div>
-                ))}
-              </div>
+              <Link
+                href={site.phoneHref}
+                className="mt-1 block text-lg font-semibold text-[var(--text-primary)] underline-offset-4 hover:text-sky-300 hover:underline"
+              >
+                {site.phoneDisplay}
+              </Link>
             </div>
             {isDev ? (
               <Link

@@ -8,7 +8,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import type { SessionType } from "@/lib/data";
+import { priceForSessionType, type SessionType } from "@/lib/data";
 import {
   generateId,
   hasConflict,
@@ -17,20 +17,33 @@ import {
   STORAGE_KEY,
   suggestSlots,
 } from "@/lib/booking/logic";
-import type { BookingRecord, DurationMinutes } from "@/lib/booking/types";
+import type {
+  BookingRecord,
+  DurationMinutes,
+  PaymentStatus,
+} from "@/lib/booking/types";
+
+type AddBookingInput = {
+  name: string;
+  email: string;
+  sessionType: SessionType;
+  date: string;
+  time: string;
+  durationMinutes: DurationMinutes;
+  notes: string;
+};
 
 type BookingContextValue = {
   bookings: BookingRecord[];
-  addBooking: (input: {
-    name: string;
-    email: string;
-    sessionType: SessionType;
-    date: string;
-    time: string;
-    durationMinutes: DurationMinutes;
-    notes: string;
-  }) => { ok: true; booking: BookingRecord } | { ok: false; reason: string };
+  addBooking: (
+    input: AddBookingInput,
+  ) => { ok: true; booking: BookingRecord } | { ok: false; reason: string };
   updateNotes: (id: string, notes: string) => void;
+  updatePayment: (
+    id: string,
+    patch: { paymentStatus: PaymentStatus },
+  ) => void;
+  cancelBooking: (id: string) => void;
   suggestFor: (date: string, duration: DurationMinutes) => string[];
   isSlotTaken: (
     date: string,
@@ -58,15 +71,9 @@ export function BookingProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const addBooking = useCallback(
-    (input: {
-      name: string;
-      email: string;
-      sessionType: SessionType;
-      date: string;
-      time: string;
-      durationMinutes: DurationMinutes;
-      notes: string;
-    }): { ok: true; booking: BookingRecord } | { ok: false; reason: string } => {
+    (
+      input: AddBookingInput,
+    ): { ok: true; booking: BookingRecord } | { ok: false; reason: string } => {
       const current = loadBookings();
       if (
         hasConflict(
@@ -92,6 +99,8 @@ export function BookingProvider({ children }: { children: React.ReactNode }) {
         durationMinutes: input.durationMinutes,
         notes: input.notes,
         createdAt: new Date().toISOString(),
+        amountUsd: priceForSessionType(input.sessionType),
+        paymentStatus: "unpaid",
       };
       const next = [...current, booking];
       saveBookings(next);
@@ -104,6 +113,33 @@ export function BookingProvider({ children }: { children: React.ReactNode }) {
   const updateNotes = useCallback((id: string, notes: string) => {
     const current = loadBookings();
     const next = current.map((b) => (b.id === id ? { ...b, notes } : b));
+    saveBookings(next);
+    setBookings(next);
+  }, []);
+
+  const updatePayment = useCallback(
+    (
+      id: string,
+      patch: { paymentStatus: PaymentStatus },
+    ) => {
+      const current = loadBookings();
+      const next = current.map((b) =>
+        b.id === id
+          ? {
+              ...b,
+              paymentStatus: patch.paymentStatus,
+            }
+          : b,
+      );
+      saveBookings(next);
+      setBookings(next);
+    },
+    [],
+  );
+
+  const cancelBooking = useCallback((id: string) => {
+    const current = loadBookings();
+    const next = current.filter((b) => b.id !== id);
     saveBookings(next);
     setBookings(next);
   }, []);
@@ -125,10 +161,20 @@ export function BookingProvider({ children }: { children: React.ReactNode }) {
       bookings,
       addBooking,
       updateNotes,
+      updatePayment,
+      cancelBooking,
       suggestFor,
       isSlotTaken,
     }),
-    [bookings, addBooking, updateNotes, suggestFor, isSlotTaken],
+    [
+      bookings,
+      addBooking,
+      updateNotes,
+      updatePayment,
+      cancelBooking,
+      suggestFor,
+      isSlotTaken,
+    ],
   );
 
   return (

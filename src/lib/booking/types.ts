@@ -2,6 +2,8 @@ import type { SessionType } from "@/lib/data";
 
 export type BookingId = string;
 
+export type PaymentStatus = "unpaid" | "pending" | "paid";
+
 export type BookingRecord = {
   id: BookingId;
   name: string;
@@ -12,6 +14,8 @@ export type BookingRecord = {
   durationMinutes: number;
   notes: string;
   createdAt: string;
+  amountUsd: number;
+  paymentStatus: PaymentStatus;
 };
 
 /** Aligned with on-site packages (60 min / 90 min). */

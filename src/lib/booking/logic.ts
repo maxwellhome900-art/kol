@@ -1,7 +1,46 @@
-import type { BookingRecord } from "./types";
+import { priceForSessionType, type SessionType } from "@/lib/data";
+import type { BookingRecord, PaymentStatus } from "./types";
 import type { DurationMinutes } from "./types";
 
 const STORAGE_KEY = "mark-photo-bookings-v1";
+
+function isSessionType(value: string): value is SessionType {
+  return (
+    value.includes("$350") ||
+    value.includes("$450") ||
+    value.toLowerCase().includes("picture") ||
+    value.toLowerCase().includes("street") ||
+    value.toLowerCase().includes("custom")
+  );
+}
+
+function asPaymentStatus(value: unknown): PaymentStatus {
+  if (value === "paid" || value === "pending" || value === "unpaid") return value;
+  return "unpaid";
+}
+
+export function normalizeBooking(raw: unknown): BookingRecord | null {
+  if (!raw || typeof raw !== "object") return null;
+  const b = raw as Record<string, unknown>;
+  const sessionType = String(b.sessionType ?? "");
+  if (!b.id || !b.date || !b.time || !isSessionType(sessionType)) return null;
+  const amountRaw = Number(b.amountUsd);
+  return {
+    id: String(b.id),
+    name: String(b.name ?? ""),
+    email: String(b.email ?? ""),
+    sessionType,
+    date: String(b.date),
+    time: String(b.time),
+    durationMinutes: Number(b.durationMinutes) || 60,
+    notes: String(b.notes ?? ""),
+    createdAt: String(b.createdAt ?? new Date().toISOString()),
+    amountUsd: Number.isFinite(amountRaw) && amountRaw > 0
+      ? amountRaw
+      : priceForSessionType(sessionType),
+    paymentStatus: asPaymentStatus(b.paymentStatus),
+  };
+}
 
 export function loadBookings(): BookingRecord[] {
   if (typeof window === "undefined") return [];
@@ -10,7 +49,7 @@ export function loadBookings(): BookingRecord[] {
     if (!raw) return [];
     const parsed = JSON.parse(raw) as unknown;
     if (!Array.isArray(parsed)) return [];
-    return parsed as BookingRecord[];
+    return parsed.map(normalizeBooking).filter((b): b is BookingRecord => b !== null);
   } catch {
     return [];
   }

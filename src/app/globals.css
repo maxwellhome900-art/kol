@@ -88,3 +88,9 @@ body {
     display: none !important;
   }
 }
+
+/* Hide the Next.js Dev Tools “N” badge */
+[data-next-badge-root],
+[data-next-badge] {
+  display: none !important;
+}

@@ -25,7 +25,8 @@ export function Pricing() {
             Packages — $350 &amp; $450 — {site.businessName}
           </h2>
           <p className="mt-4 text-[var(--text-muted)]">
-            {site.eveningHoldWindowLabel} Scope and nuance through{" "}
+            {site.eveningHoldWindowLabel} Confirm a hold on the booking desk.
+            Scope and nuance through{" "}
             <a
               href="#marko-ai"
               className="font-medium text-amber-200/90 underline-offset-4 hover:underline"

@@ -1,8 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { ParticleField } from "@/components/effects/ParticleField";
 import { site } from "@/lib/data";
+import { openMarkoAI } from "@/lib/marko/open";
 
 export type HeroMode = "photo" | "dev";
 
@@ -60,7 +62,7 @@ export function Hero({ mode = "photo" }: { mode?: HeroMode }) {
           {isPhoto ? (
             <span className="ml-3 text-amber-200/90">— {site.businessName}</span>
           ) : (
-            <span className="ml-3 text-sky-300/90">— Web development</span>
+            <span className="ml-3 text-sky-300/90">— Software Engineer</span>
           )}
         </motion.p>
 
@@ -112,16 +114,94 @@ export function Hero({ mode = "photo" }: { mode?: HeroMode }) {
               className="mt-5 max-w-2xl text-lg leading-relaxed text-[var(--text-muted)] md:text-xl"
             >
               Need to book or ask a question?{" "}
-              <a
-                href="#marko-ai"
+              <button
+                type="button"
+                onClick={() => openMarkoAI()}
                 className="font-semibold text-amber-200/95 underline decoration-amber-400/35 underline-offset-4 transition hover:text-amber-100"
               >
                 {site.agentName}
-              </a>{" "}
+              </button>{" "}
               {site.photographyHeroMarkoTail}
             </motion.p>
           </>
-        ) : null}
+        ) : (
+          <>
+            <motion.p
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.65, delay: 0.68 }}
+              className="mt-5 max-w-2xl text-lg leading-relaxed text-[var(--text-muted)] md:text-xl"
+            >
+              {site.devHeroCraftTail}
+            </motion.p>
+            <motion.p
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.65, delay: 0.8 }}
+              className="mt-5 max-w-2xl text-lg leading-relaxed text-[var(--text-muted)] md:text-xl"
+            >
+              <button
+                type="button"
+                onClick={() => openMarkoAI()}
+                className="font-semibold text-sky-200/95 underline decoration-sky-400/35 underline-offset-4 transition hover:text-sky-100"
+              >
+                {site.agentName}
+              </button>{" "}
+              {site.devHeroMarkoTail}
+            </motion.p>
+          </>
+        )}
+
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.65, delay: 0.92 }}
+          className="mt-10 flex flex-wrap gap-3"
+        >
+          {isPhoto ? (
+            <>
+              <Link
+                href="#gallery"
+                className="rounded-full bg-gradient-to-r from-amber-400 to-orange-500 px-6 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-amber-500/20"
+              >
+                View gallery
+              </Link>
+              <Link
+                href="#booking"
+                className="rounded-full border border-amber-400/35 bg-amber-500/10 px-6 py-3 text-sm font-semibold text-amber-50"
+              >
+                Book a hold
+              </Link>
+              <Link
+                href="/dev"
+                className="rounded-full border border-sky-400/30 bg-sky-500/10 px-6 py-3 text-sm font-semibold text-sky-50"
+              >
+                Software Engineer
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link
+                href="#projects"
+                className="rounded-full bg-gradient-to-r from-sky-500 to-cyan-400 px-6 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-sky-500/20"
+              >
+                Selected work
+              </Link>
+              <Link
+                href="#contact"
+                className="rounded-full border border-sky-400/35 bg-sky-500/10 px-6 py-3 text-sm font-semibold text-sky-50"
+              >
+                Hire Mark
+              </Link>
+              <Link
+                href="/"
+                className="rounded-full border border-amber-400/30 bg-amber-500/10 px-6 py-3 text-sm font-semibold text-amber-50"
+              >
+                Photography studio
+              </Link>
+            </>
+          )}
+        </motion.div>
       </div>
 
       <motion.div

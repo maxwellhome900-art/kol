@@ -14,11 +14,8 @@ type Body = {
 
 /**
  * Fires when a visitor confirms an intelligent hold.
- * Set DISCORD_WEBHOOK_URL for instant pings, and optionally Resend for email.
- *
- * Resend: https://resend.com/docs/api-reference/emails/send-email
- * Env: RESEND_API_KEY, RESEND_FROM (verified sender), optional BOOKING_INBOX_EMAIL (defaults to site.email)
- * Optional Twilio SMS: TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM, TWILIO_TO
+ * Always emails the studio inbox (FormSubmit → site.email / BOOKING_INBOX_EMAIL).
+ * Optional: Resend (RESEND_API_KEY + RESEND_FROM), Discord, Twilio.
  */
 export async function POST(request: Request) {
   let raw: Body;
@@ -108,6 +105,9 @@ export async function POST(request: Request) {
     }
   }
 
+  const plain = lines.replace(/\*\*/g, "");
+  const subject = `[Hold] ${date} ${time} — ${name}`;
+
   let emailed = false;
   const resendKey = process.env.RESEND_API_KEY?.trim();
   const resendFrom = process.env.RESEND_FROM?.trim();
@@ -123,10 +123,10 @@ export async function POST(request: Request) {
           from: resendFrom,
           to: [inbox],
           reply_to: email,
-          subject: `[Hold] ${date} ${time} — ${name}`,
-          text: lines.replace(/\*\*/g, ""),
+          subject,
+          text: plain,
           html: `<pre style="font-family:system-ui,sans-serif;white-space:pre-wrap">${escapeHtml(
-            lines.replace(/\*\*/g, ""),
+            plain,
           )}</pre>`,
         }),
       });
@@ -140,12 +140,13 @@ export async function POST(request: Request) {
     }
   }
 
-  if (!webhook && !emailed && !smsOk) {
-    return NextResponse.json({
-      ok: true,
-      delivered: false,
-      warning:
-        "No DISCORD_WEBHOOK_URL, Resend, or Twilio configuration found — configure one to receive hold alerts.",
+  if (!emailed) {
+    emailed = await sendViaFormSubmit({
+      inbox,
+      visitorEmail: email,
+      visitorName: name,
+      subject,
+      message: plain,
     });
   }
 
@@ -156,6 +157,49 @@ export async function POST(request: Request) {
     sms: smsOk,
     email: emailed,
   });
+}
+
+async function sendViaFormSubmit(input: {
+  inbox: string;
+  visitorEmail: string;
+  visitorName: string;
+  subject: string;
+  message: string;
+}): Promise<boolean> {
+  try {
+    const res = await fetch(
+      `https://formsubmit.co/ajax/${encodeURIComponent(input.inbox)}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          name: input.visitorName,
+          email: input.visitorEmail,
+          _replyto: input.visitorEmail,
+          _subject: input.subject,
+          message: input.message,
+          _template: "table",
+          _captcha: "false",
+        }),
+      },
+    );
+    if (!res.ok) {
+      const errText = await res.text().catch(() => "");
+      console.error("FormSubmit booking email failed", res.status, errText);
+      return false;
+    }
+    const payload = (await res.json().catch(() => null)) as
+      | { success?: string | boolean }
+      | null;
+    const success = payload?.success;
+    return success === true || success === "true";
+  } catch (e) {
+    console.error("FormSubmit booking email error", e);
+    return false;
+  }
 }
 
 function escapeHtml(s: string): string {

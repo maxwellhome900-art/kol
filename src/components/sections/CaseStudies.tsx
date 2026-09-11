@@ -25,11 +25,11 @@ export function CaseStudies() {
             Case studies
           </p>
           <h2 className="mt-3 font-[family-name:var(--font-syne)] text-3xl font-semibold tracking-tight text-[var(--text-primary)] md:text-4xl">
-            Outcomes, not vanity slides
+            Software engineering, with outcomes
           </h2>
           <p className="mt-4 text-[var(--text-muted)]">
-            A few anonymized engagements — each pairing product judgment with
-            measurable lift.
+            Frontend UIs, backend APIs, and full-stack web apps — anonymized
+            engagements with measurable lift.
           </p>
         </motion.div>
 
@@ -48,7 +48,7 @@ export function CaseStudies() {
               whileHover={{ y: -6 }}
               className="group relative flex flex-col overflow-hidden rounded-3xl border border-[var(--border-glass)] bg-[var(--bg-elevated)]/80 p-8 shadow-xl shadow-black/25 backdrop-blur-md"
             >
-              <div className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-cyan-500/20 blur-3xl transition-opacity group-hover:opacity-100" />
+              <div className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-sky-500/20 blur-3xl transition-opacity group-hover:opacity-100" />
               <div className="mb-4 flex items-center justify-between gap-2">
                 <Badge variant="secondary" className="rounded-full">
                   {c.client}

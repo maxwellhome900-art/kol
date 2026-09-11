@@ -1,6 +1,6 @@
 # Mark Photography — Portfolio
 
-Personal portfolio blending **software engineering** and **photography**: a **photography-first** home (`/`), a dedicated **web development** route (`/dev`), a **smart booking** flow with **studio dashboard** (`/dashboard`), pricing, gallery, and a floating **Mark Photography** chat with optional Discord notifications.
+Personal portfolio blending **software engineering** and **photography**: a **photography-first** home (`/`), a dedicated **software engineer** route (`/dev`), a **smart booking** flow with **studio dashboard** (`/dashboard`), pricing, gallery, and a floating **Mark Photography** chat with optional Discord notifications.
 
 **Full architecture, booking behavior, and workflow plans:** [docs/APP.md](./docs/APP.md).
 

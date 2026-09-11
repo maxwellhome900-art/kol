@@ -10,25 +10,27 @@ import { Moon, Sun, Menu, X } from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useSyncExternalStore } from "react";
+import { useState, useSyncExternalStore, type MouseEvent } from "react";
 import { site } from "@/lib/data";
+import { openMarkoAI } from "@/lib/marko/open";
 
 const photoLinks = [
   { href: "/#about", label: "About" },
   { href: "/#gallery", label: "Gallery" },
-  { href: "/#marko-ai", label: site.agentName },
   { href: "/#pricing", label: "Packages" },
   { href: "/#timeline", label: "Rhythm" },
+  { href: "/#reviews", label: "Reviews" },
   { href: "/#contact", label: "Contact" },
 ];
 
 const devLinks = [
-  { href: "/dev#hero", label: "Intro" },
+  { href: "/dev#about", label: "About" },
+  { href: "/dev#services", label: "Engagements" },
   { href: "/dev#projects", label: "Projects" },
   { href: "/dev#case-studies", label: "Case studies" },
   { href: "/dev#skills", label: "Skills" },
+  { href: "/dev#reviews", label: "Reviews" },
   { href: "/dev#contact", label: "Contact" },
-  { href: "/#marko-ai", label: site.agentName },
 ];
 
 export function Navbar() {
@@ -52,11 +54,25 @@ export function Navbar() {
   const toggle = () =>
     setTheme(resolvedTheme === "dark" ? "light" : "dark");
 
-  const brandHref = isDashboard
-    ? "/dashboard"
-    : isDev
-      ? "/dev#hero"
-      : "/#hero";
+  const brandHref = isDashboard ? "/dashboard" : isDev ? "/dev#hero" : "/#hero";
+
+  const scrollToTopIfCurrent = (
+    event: MouseEvent<HTMLAnchorElement>,
+  ) => {
+    const onThisPage =
+      (isDashboard && pathname.startsWith("/dashboard")) ||
+      (isDev && pathname.startsWith("/dev")) ||
+      (!isDashboard && !isDev && pathname === "/");
+    if (!onThisPage) return;
+    event.preventDefault();
+    const hero = document.getElementById("hero");
+    if (hero) {
+      hero.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+    }
+    window.history.replaceState(null, "", brandHref);
+  };
 
   return (
     <motion.header
@@ -77,6 +93,7 @@ export function Navbar() {
       >
         <Link
           href={brandHref}
+          onClick={scrollToTopIfCurrent}
           className="font-[family-name:var(--font-syne)] text-lg font-semibold tracking-tight text-[var(--text-primary)]"
         >
           {site.name}
@@ -88,22 +105,34 @@ export function Navbar() {
           aria-label="Primary"
         >
           {isDashboard && (
-            <Link
-              href="/"
-              className="rounded-full px-3 py-1.5 text-sm text-[var(--text-muted)] transition-colors hover:bg-white/5 hover:text-[var(--text-primary)]"
-            >
-              Photography home
-            </Link>
+            <>
+              <Link
+                href="/"
+                className="rounded-full px-3 py-1.5 text-sm text-[var(--text-muted)] transition-colors hover:bg-white/5 hover:text-[var(--text-primary)]"
+              >
+                Photography
+              </Link>
+              <Link
+                href="/dev"
+                className="rounded-full px-3 py-1.5 text-sm text-[var(--text-muted)] transition-colors hover:bg-white/5 hover:text-[var(--text-primary)]"
+              >
+                Software Engineer
+              </Link>
+              <Link
+                href="/#booking"
+                className="rounded-full px-3 py-1.5 text-sm text-[var(--text-muted)] transition-colors hover:bg-white/5 hover:text-[var(--text-primary)]"
+              >
+                New booking
+              </Link>
+            </>
           )}
           {!isDashboard && !isDev && (
-            <a
-              href="https://mark-portfolio-eight.vercel.app/"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/dev"
               className="mr-2 rounded-full border border-sky-400/25 bg-sky-500/10 px-3 py-1.5 text-xs font-semibold text-sky-100 transition hover:bg-sky-500/20"
             >
-              Dev portfolio
-            </a>
+              Software Engineer
+            </Link>
           )}
           {!isDashboard && isDev && (
             <Link
@@ -130,6 +159,13 @@ export function Navbar() {
               Dashboard
             </Link>
           )}
+          <button
+            type="button"
+            onClick={() => openMarkoAI()}
+            className="rounded-full px-3 py-1.5 text-sm text-[var(--text-muted)] transition-colors hover:bg-white/5 hover:text-[var(--text-primary)]"
+          >
+            {site.agentName}
+          </button>
         </nav>
 
         <div className="flex items-center gap-2">
@@ -149,17 +185,15 @@ export function Navbar() {
             </motion.button>
           )}
 
-          {!isDashboard && (
-            <button
-              type="button"
-              className="glass flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border-glass)] md:hidden"
-              aria-label={open ? "Close menu" : "Open menu"}
-              aria-expanded={open}
-              onClick={() => setOpen((o) => !o)}
-            >
-              {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-            </button>
-          )}
+          <button
+            type="button"
+            className="glass flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border-glass)] md:hidden"
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            onClick={() => setOpen((o) => !o)}
+          >
+            {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          </button>
         </div>
       </div>
 
@@ -174,24 +208,38 @@ export function Navbar() {
             className="glass mt-2 flex max-h-[min(70dvh,520px)] flex-col gap-1 overflow-y-auto rounded-2xl border border-[var(--border-glass)] p-3 md:hidden"
           >
             {isDashboard && (
-              <Link
-                href="/"
-                onClick={() => setOpen(false)}
-                className="rounded-xl px-3 py-2 text-sm text-[var(--text-muted)] hover:bg-white/5 hover:text-[var(--text-primary)]"
-              >
-                Photography home
-              </Link>
+              <>
+                <Link
+                  href="/"
+                  onClick={() => setOpen(false)}
+                  className="rounded-xl px-3 py-2 text-sm text-[var(--text-muted)] hover:bg-white/5 hover:text-[var(--text-primary)]"
+                >
+                  Photography
+                </Link>
+                <Link
+                  href="/dev"
+                  onClick={() => setOpen(false)}
+                  className="rounded-xl px-3 py-2 text-sm text-[var(--text-muted)] hover:bg-white/5 hover:text-[var(--text-primary)]"
+                >
+                  Software Engineer
+                </Link>
+                <Link
+                  href="/#booking"
+                  onClick={() => setOpen(false)}
+                  className="rounded-xl px-3 py-2 text-sm text-[var(--text-muted)] hover:bg-white/5 hover:text-[var(--text-primary)]"
+                >
+                  New booking
+                </Link>
+              </>
             )}
             {!isDashboard && !isDev && (
-              <a
-                href="https://mark-portfolio-eight.vercel.app/"
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                href="/dev"
                 onClick={() => setOpen(false)}
                 className="rounded-xl bg-sky-500/15 px-3 py-2 text-center text-sm font-semibold text-sky-100"
               >
-                Web development
-              </a>
+                Software Engineer
+              </Link>
             )}
             {!isDashboard && isDev && (
               <Link
@@ -221,6 +269,16 @@ export function Navbar() {
                 Dashboard
               </Link>
             )}
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                openMarkoAI();
+              }}
+              className="rounded-xl px-3 py-2 text-left text-sm text-[var(--text-muted)] hover:bg-white/5 hover:text-[var(--text-primary)]"
+            >
+              {site.agentName}
+            </button>
           </motion.div>
         )}
       </AnimatePresence>

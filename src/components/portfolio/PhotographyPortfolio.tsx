@@ -9,6 +9,7 @@ import { BookingSection } from "@/components/booking/BookingSection";
 import { Contact } from "@/components/sections/Contact";
 import { Gallery } from "@/components/sections/Gallery";
 import { Hero } from "@/components/sections/Hero";
+import { PhotographyReviews } from "@/components/sections/PhotographyReviews";
 import { Pricing } from "@/components/sections/Pricing";
 import { Timeline } from "@/components/sections/Timeline";
 
@@ -26,6 +27,7 @@ export function PhotographyPortfolio() {
         <BookingSection />
         <Pricing />
         <Timeline />
+        <PhotographyReviews />
         <Contact variant="photo" />
       </main>
       <SiteFooter />

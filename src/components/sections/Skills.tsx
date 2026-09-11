@@ -165,7 +165,7 @@ export function Skills() {
             <div className="relative mt-8 grid grid-cols-2 gap-4 text-center">
               <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
                 <StatCounter
-                  target={8}
+                  target={5}
                   suffix="+"
                   className="text-sky-300"
                 />

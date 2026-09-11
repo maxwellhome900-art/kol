@@ -11,9 +11,9 @@ import {
 import { useCallback, useMemo, useState } from "react";
 import Link from "next/link";
 import { useBooking } from "@/context/booking-context";
-import { site, sessionTypes, type SessionType } from "@/lib/data";
+import { formatUsd, priceForSessionType, site, sessionTypes, type SessionType } from "@/lib/data";
 import { getEveningSlotsForUi, allEveningSlotLabels } from "@/lib/booking/logic";
-import { DURATION_OPTIONS, type DurationMinutes } from "@/lib/booking/types";
+import { DURATION_OPTIONS, type BookingRecord, type DurationMinutes } from "@/lib/booking/types";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -64,10 +64,8 @@ export function BookingSection() {
   const [notes, setNotes] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [lastBooking, setLastBooking] = useState<{
-    date: string;
-    time: string;
-  } | null>(null);
+  const [lastBooking, setLastBooking] = useState<BookingRecord | null>(null);
+  const [emailSent, setEmailSent] = useState(false);
 
   const year = cursor.getFullYear();
   const month = cursor.getMonth();
@@ -130,8 +128,9 @@ export function BookingSection() {
         return;
       }
       const b = result.booking;
+      let notified = false;
       try {
-        await fetch("/api/booking-notify", {
+        const res = await fetch("/api/booking-notify", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -145,10 +144,15 @@ export function BookingSection() {
             notes: b.notes,
           }),
         });
+        const payload = (await res.json().catch(() => null)) as
+          | { email?: boolean; delivered?: boolean }
+          | null;
+        notified = Boolean(payload?.email || payload?.delivered);
       } catch {
-        /* non-blocking — hold is still saved locally */
+        /* Hold is still saved locally even if the inbox ping fails. */
       }
-      setLastBooking({ date: selectedDate, time });
+      setEmailSent(notified);
+      setLastBooking(b);
       setConfirmOpen(true);
       setNotes("");
     },
@@ -197,23 +201,22 @@ export function BookingSection() {
               >
                 studio dashboard
               </Link>
-              . Confirming a hold emails Mark when{" "}
-              <code className="rounded bg-white/10 px-1 text-xs">
-                RESEND_API_KEY
-              </code>{" "}
-              or{" "}
-              <code className="rounded bg-white/10 px-1 text-xs">
-                DISCORD_WEBHOOK_URL
-              </code>{" "}
-              is configured.
+              . Confirming a hold emails Mark at{" "}
+              <a
+                href={`mailto:${site.email}`}
+                className="font-medium text-amber-200/90 underline-offset-4 hover:underline"
+              >
+                {site.email}
+              </a>
+              .
             </p>
           </div>
           <p className="max-w-xs text-right text-sm text-[var(--text-muted)]">
             <span className="block text-[var(--text-primary)]">
-              $350 · portrait session · 45 min
+              $350 · portrait session
             </span>
             <span className="mt-2 block text-[var(--text-primary)]">
-              $450 · extended session · 60 min
+              $450 · extended session
             </span>
             <span className="mt-2 block text-[var(--text-primary)]">
               Picture-only from $10
@@ -457,6 +460,14 @@ export function BookingSection() {
               />
             </div>
 
+            <div className="rounded-2xl border border-amber-400/20 bg-amber-500/8 px-4 py-3 text-sm text-[var(--text-muted)]">
+              Package total:{" "}
+              <strong className="text-[var(--text-primary)]">
+                {formatUsd(priceForSessionType(sessionType))}
+              </strong>
+              . Confirming saves the hold on the studio dashboard.
+            </div>
+
             <AnimatePresence>
               {error && (
                 <motion.p
@@ -491,8 +502,11 @@ export function BookingSection() {
             </DialogTitle>
             <DialogDescription>
               {lastBooking
-                ? `Locked ${lastBooking.date} at ${lastBooking.time}. The hold is saved in this browser and in the studio dashboard; if the host configured email or Discord, Mark was notified too.`
-                : "Session saved locally in this browser."}
+                ? `Locked ${lastBooking.date} at ${lastBooking.time} · ${formatUsd(lastBooking.amountUsd)}. The hold is on the studio dashboard.`
+                : "Session saved locally in this browser."}{" "}
+              {emailSent
+                ? `Mark was emailed at ${site.email}.`
+                : `If this is the first hold, open ${site.email} and confirm the one-time activation so future holds arrive automatically.`}
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end gap-2">

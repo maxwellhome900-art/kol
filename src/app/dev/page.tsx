@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { DevPortfolio } from "@/components/portfolio/DevPortfolio";
 
 export const metadata: Metadata = {
-  title: "Web development portfolio",
+  title: "Software Engineer portfolio",
   description:
-    "Interfaces, systems, and product craft — Next.js, TypeScript, and design systems.",
+    "Interfaces, systems, and this photography studio itself — Next.js, TypeScript, and design systems with the same cinematic brand.",
 };
 
 export default function DevPage() {

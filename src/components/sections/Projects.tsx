@@ -32,13 +32,13 @@ export function Projects() {
     >
       <motion.div
         aria-hidden
-        className="pointer-events-none absolute -left-20 top-20 h-72 w-72 rounded-full bg-cyan-500/15 blur-3xl"
+        className="pointer-events-none absolute -left-20 top-20 h-72 w-72 rounded-full bg-sky-500/15 blur-3xl"
         animate={{ x: [0, 24, 0], y: [0, -16, 0] }}
         transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
         aria-hidden
-        className="pointer-events-none absolute -right-16 bottom-10 h-80 w-80 rounded-full bg-violet-500/12 blur-3xl"
+        className="pointer-events-none absolute -right-16 bottom-10 h-80 w-80 rounded-full bg-amber-500/12 blur-3xl"
         animate={{ x: [0, -20, 0], y: [0, 20, 0] }}
         transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
       />
@@ -58,8 +58,8 @@ export function Projects() {
               Selected projects
             </h2>
             <p className="mt-4 text-[var(--text-muted)]">
-              Product-grade interfaces, APIs, and systems — crafted with the
-              same attention to composition I bring to a frame.
+              Starting with this studio itself, then live product fronts — shop,
+              listings, dashboard, and design system.
             </p>
           </div>
         </motion.div>
@@ -125,11 +125,12 @@ export function Projects() {
                     <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.97 }}>
                       <Link
                         href={p.demo}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        target={p.demo.startsWith("/") ? undefined : "_blank"}
+                        rel={p.demo.startsWith("/") ? undefined : "noopener noreferrer"}
                         className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-sky-500 to-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950"
                       >
-                        Live demo
+                        {p.demoLabel ??
+                          (p.demo.startsWith("/") ? "Open studio" : "Live demo")}
                         <ExternalLink className="h-4 w-4" />
                       </Link>
                     </motion.div>

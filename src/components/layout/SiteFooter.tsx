@@ -9,17 +9,31 @@ export function SiteFooter() {
     <footer className="border-t border-[var(--border-glass)] px-6 py-10">
       <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-6 text-sm text-[var(--text-muted)] md:flex-row md:items-center">
         <p>
-          © {new Date().getFullYear()} {site.businessName}. Built with Tailwind,
-          Framer Motion, and refined interface patterns.
+          © 2026 {site.businessName}. Photography studio and
+          software engineering — one brand.
         </p>
-        <motion.div whileHover={{ y: -2 }}>
-          <Link
-            href="#hero"
-            className="text-[var(--text-primary)] underline-offset-4 hover:underline"
-          >
-            Back to top
+        <div className="flex flex-wrap items-center gap-4">
+          <Link href="/gallery" className="text-[var(--text-primary)] underline-offset-4 hover:underline">
+            Gallery
           </Link>
-        </motion.div>
+          <Link href="/" className="text-[var(--text-primary)] underline-offset-4 hover:underline">
+            Photography
+          </Link>
+          <Link href="/dev" className="text-[var(--text-primary)] underline-offset-4 hover:underline">
+            Software Engineer
+          </Link>
+          <Link href="/dashboard" className="text-[var(--text-primary)] underline-offset-4 hover:underline">
+            Dashboard
+          </Link>
+          <motion.div whileHover={{ y: -2 }}>
+            <Link
+              href="#hero"
+              className="text-[var(--text-primary)] underline-offset-4 hover:underline"
+            >
+              Back to top
+            </Link>
+          </motion.div>
+        </div>
       </div>
     </footer>
   );
